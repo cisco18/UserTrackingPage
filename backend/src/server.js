@@ -6,8 +6,12 @@ const userInterfaceRoutes = require('./routes/mainPage')
 const userProfileRoutes = require('./routes/userUpdate')
 const statsRoutes = require('./routes/userStats')
 
+var cors = require('cors')
+
 const bodyParser = require('body-parser')
 const app = express();
+
+app.use(cors());
 
 app.use(bodyParser.json());
 app.use(

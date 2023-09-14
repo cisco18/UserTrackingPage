@@ -5,7 +5,6 @@ const User = require('../models/User')
 
 const handleAuth = async (req, res) => {
   const user = await User.findOne(({ uid: req.body.uidStorage }))
-  console.log(user)
   try {
     const { uidStorage }  = req.body;
     if (!uidStorage) {

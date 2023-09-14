@@ -22,7 +22,6 @@ const MainPage = () => {
           throw new Error('API request failed');
         }
         const data = await response.json();
-        console.log(data)
         const newUid = data.uid;
         sessionStorage.setItem('userUid', newUid);
         return newUid;
@@ -39,12 +38,13 @@ const MainPage = () => {
     
     var uidStorage = await checkIfUserHasSession();
     const loginMessage = {uidStorage}
-    const response = await fetch('/api/start/',{
+    const response = await fetch('http://localhost:4000/api/start/',{
       method: 'POST',
       body: JSON.stringify(loginMessage),
       headers: {
         'Content-Type': 'application/json'
       }
+      
 
     })
 
@@ -78,10 +78,9 @@ const MainPage = () => {
     if (imageElement && imageElement.getBoundingClientRect().top <= 0) { 
       const scrolled = true;
       const scrollMessage = { userUid,scrolled }
-      console.log(scrollMessage)
-      console.log('User scrolled to the top of the image');
+
       window.removeEventListener('scroll', handleScroll);
-      const response = await fetch('/api/profile/update/',{
+      const response = await fetch('http://localhost:4000/api/profile/update/',{
         method: 'PUT',
         body: JSON.stringify(scrollMessage),
         headers: {

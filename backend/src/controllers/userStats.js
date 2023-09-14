@@ -8,13 +8,13 @@ const getStats = async (req, res) => {
     const userCount = allUsers.length;
     const scrolledUserCount = scrolledUsers.length;
 
-    res.status(200).json({
+    return res.status(200).json({
       totalUsers: userCount,
       scrolledUsersCount: scrolledUserCount,
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
 

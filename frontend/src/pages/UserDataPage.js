@@ -21,10 +21,9 @@ const StatisticsPage = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/stats/all/')
+    fetch('http://localhost:4000/api/stats/all/')
       .then((response) => response.json())
       .then((data) => {
-        console.log(data)
         const { totalUsers, scrolledUsersCount } = data;
         const formattedData = [
           {

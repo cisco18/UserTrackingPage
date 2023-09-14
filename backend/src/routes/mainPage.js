@@ -8,7 +8,6 @@ const {
 
 router.use('/', async (req, res, next) => {
     res = await handleAuth(req, res)
-    console.log(res.statusCode == 200)
     next();
 })
 
