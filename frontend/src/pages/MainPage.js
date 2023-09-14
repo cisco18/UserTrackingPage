@@ -4,57 +4,92 @@ import { TenParagraphs } from '../components/Paragraph'
 import { Typography, Avatar, Button, Statistic } from 'antd';
 import { uid } from 'uid';
 
-const { Title} = Typography;
+const { Title } = Typography;
 
 const MainPage = () => {
-  const [userScroll, setUserScroll] = useState(false);
+  const [userLogged, setUserLogged] = useState(false);
   const [serverInfo, setServerInfo] = useState('');
   const [userUid, setUserUid] = useState('');
 
-  useEffect(() => {
-    const handleLogin = async () => {
-      const uidStorage = sessionStorage.getItem('userUid');
-      const content = {uidStorage}
-      if (!userUid) {
+  const apiUrl = 'https://random-data-api.com/api/v2/users?size=1';
+
+  const checkIfUserHasSession = async () => {
+    var uidStorage = sessionStorage.getItem('userUid');
+    if (!uidStorage) {
+      try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+          throw new Error('API request failed');
+        }
+        const data = await response.json();
+        console.log(data)
+        const newUid = data.uid;
+        sessionStorage.setItem('userUid', newUid);
+        return newUid;
+      } catch (error) {
         const newUid = uid();
         sessionStorage.setItem('userUid', newUid);
-      }
-      const response = await fetch('/api/',{
-        method: 'POST',
-        body: JSON.stringify(content),
-        headers: {
-          'Content-Type': 'application/json'
-        }
-
-      })
-
-      const serverResponse = await response.json()
-      console.log(serverResponse)
-
-      if (response.ok) {
-
-        setServerInfo(serverResponse.info)
-        setUserUid(uidStorage)
+        return newUid;
       }
     }
+    return uidStorage;
+  };
 
+  const handleLogin = async () => {
+    
+    var uidStorage = await checkIfUserHasSession();
+    const loginMessage = {uidStorage}
+    const response = await fetch('/api/start/',{
+      method: 'POST',
+      body: JSON.stringify(loginMessage),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+
+    })
+
+    const serverResponse = await response.json()
+
+    if (response.ok) {
+      setUserLogged(true);
+      setServerInfo(serverResponse.info);
+      setUserUid(uidStorage);
+    }
+  }
+
+
+  useEffect(() => {
     handleLogin()
 
-    window.addEventListener('scroll', handleScroll);
+    // cleanup function 
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
 
-      return () => {
-        window.removeEventListener('scroll', handleScroll);
-      };
+    
   }, [])
 
-  const handleScroll = () => {
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+  }, [userLogged])
+
+  const handleScroll = async () => {
     const imageElement = document.getElementById('user-avatar');
-    if (imageElement && imageElement.getBoundingClientRect().top <= 0) {
-      if (!userScroll) {
-        console.log('User scrolled to the top of the image');
-        setUserScroll(true);
-      }
-    }
+    if (imageElement && imageElement.getBoundingClientRect().top <= 0) { 
+      const scrolled = true;
+      const scrollMessage = { userUid,scrolled }
+      console.log(scrollMessage)
+      console.log('User scrolled to the top of the image');
+      window.removeEventListener('scroll', handleScroll);
+      const response = await fetch('/api/profile/update/',{
+        method: 'PUT',
+        body: JSON.stringify(scrollMessage),
+        headers: {
+          'Content-Type': 'application/json'
+        }});
+        
+  }
+
   };
 
   return (

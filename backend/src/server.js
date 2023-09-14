@@ -2,7 +2,10 @@ require('dotenv').config();
 
 const express = require('express');
 const mongoose = require('mongoose');
-const userInterfaceRoutes = require('./routes/userInterface')
+const userInterfaceRoutes = require('./routes/mainPage')
+const userProfileRoutes = require('./routes/userUpdate')
+const statsRoutes = require('./routes/userStats')
+
 const bodyParser = require('body-parser')
 const app = express();
 
@@ -13,8 +16,9 @@ app.use(
   }),
 );
 
-
-app.use('/api', userInterfaceRoutes)
+app.use('/api/start/', userInterfaceRoutes)
+app.use('/api/profile/', userProfileRoutes)
+app.use('/api/stats/', statsRoutes)
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {

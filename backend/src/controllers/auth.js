@@ -3,27 +3,32 @@ const User = require('../models/User')
 
 
 
-  const handleAuth = async (req, res) => {
-    const user = await User.findOne(({ userUid: req.body.userUid }))
-
-    if(user !== null){
-      return res.status(200)
-    }else {
-    const {userUid} = req.body
-    try {
-      const user = await User.create({uid: userUid })
-      return res.status(200)
-    } catch (error) {
-      console.log(error)
-      return res.status(400)
+const handleAuth = async (req, res) => {
+  const user = await User.findOne(({ uid: req.body.uidStorage }))
+  console.log(user)
+  try {
+    const { uidStorage }  = req.body;
+    if (!uidStorage) {
+        return res.status(400).json({ error: "userUid is required" });
     }
+    const user = await User.findOne({ uid: uidStorage });
+
+    if (user !== null) {
+      return res.status(200)
+    } else {
+      const newUser = await User.create({ uid: uidStorage });
+      return res.status(200)
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500)
   }
-    return 
-  }
+}
 
 
 
-  module.exports = {
-    handleAuth,
-  }
+
+module.exports = {
+  handleAuth,
+}
 
