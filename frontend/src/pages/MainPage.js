@@ -9,13 +9,13 @@ const {Title} = Typography;
 const MainPage = () => {
   const [userLogged, setUserLogged] = useState(false);
   const [serverInfo, setServerInfo] = useState('');
-  const [userUid, setUserUid] = useState('');
+  const [userUidState, setUserUid] = useState('');
 
   const apiUrl = 'https://random-data-api.com/api/v2/users?size=1';
 
   const checkIfUserHasSession = async () => {
-    const uidStorage = sessionStorage.getItem('userUid');
-    if (!uidStorage) {
+    const userUid = sessionStorage.getItem('userUid');
+    if (!userUid) {
       try {
         const response = await fetch(apiUrl);
         if (!response.ok) {
@@ -31,12 +31,12 @@ const MainPage = () => {
         return newUid;
       }
     }
-    return uidStorage;
+    return userUid;
   };
 
   const handleLogin = async () => {
-    const uidStorage = await checkIfUserHasSession();
-    const loginMessage = {uidStorage};
+    const userUid = await checkIfUserHasSession();
+    const loginMessage = {userUid};
     const response = await fetch('http://localhost:4000/api/start/', {
       method: 'POST',
       body: JSON.stringify(loginMessage),
@@ -52,7 +52,7 @@ const MainPage = () => {
     if (response.ok) {
       setUserLogged(true);
       setServerInfo(serverResponse.info);
-      setUserUid(uidStorage);
+      setUserUid(userUid);
     }
   };
 
@@ -74,7 +74,7 @@ const MainPage = () => {
     const imageElement = document.getElementById('user-avatar');
     if (imageElement && imageElement.getBoundingClientRect().top <= 0) {
       const scrolled = true;
-      const scrollMessage = {userUid, scrolled};
+      const scrollMessage = {userUid: userUidState, scrolled};
 
       window.removeEventListener('scroll', handleScroll);
       await fetch('http://localhost:4000/api/profile/update/', {
@@ -93,7 +93,7 @@ const MainPage = () => {
           <Button href='/stats'>User stats</Button>
         </div>
         <div>
-          <Statistic title="Your ID:" value={userUid} />
+          <Statistic title="Your ID:" value={userUidState} />
           <Statistic title="Server info: " value={serverInfo} />
         </div>
 
