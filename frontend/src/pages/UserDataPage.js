@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Table } from 'antd';
+import React, {useEffect, useState} from 'react';
+import {Table} from 'antd';
 
 
 const columns = [
@@ -16,38 +16,35 @@ const columns = [
 ];
 
 const StatisticsPage = () => {
-
   const [statisticsData, setStatisticsData] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/stats/all/')
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data)
-        const { totalUsers, scrolledUsersCount } = data;
-        const formattedData = [
-          {
-            key: '1',
-            info: 'Number of users who accessed the initial page',
-            value: totalUsers,
-          },
-          {
-            key: '2',
-            info: 'Number of users who scrolled to the image',
-            value: `${scrolledUsersCount}`,
-          },
-        ];
-        setStatisticsData(formattedData);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error('Error fetching data:', error);
-        setLoading(false);
-      });
+    fetch('http://localhost:4000/api/stats/all/')
+        .then((response) => response.json())
+        .then((data) => {
+          const {totalUsers, scrolledUsersCount} = data;
+          const formattedData = [
+            {
+              key: '1',
+              info: 'Number of users who accessed the initial page',
+              value: totalUsers,
+            },
+            {
+              key: '2',
+              info: 'Number of users who scrolled to the image',
+              value: `${scrolledUsersCount}`,
+            },
+          ];
+          setStatisticsData(formattedData);
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error('Error fetching data:', error);
+          setLoading(false);
+        });
   }, []);
 
-  
 
   return (
     <div>

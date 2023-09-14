@@ -1,7 +1,8 @@
 import React from 'react';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import {BrowserRouter, Route, Routes} from 'react-router-dom';
 import MainPage from './pages/MainPage';
 import StatisticsPage from './pages/UserDataPage';
+
 
 function App() {
   return (
@@ -11,7 +12,8 @@ function App() {
           <Route path="/stats" element={<StatisticsPage/>}>
           </Route>
           <Route path="/" element={<MainPage/>}>
-            
+
+
           </Route>
         </Routes>
       </BrowserRouter>
