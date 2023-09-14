@@ -1,13 +1,23 @@
+const User = require('../models/User');
 
-const User = require('../models/User')
+const getStats = async (req, res) => {
+  try {
+    const allUsers = await User.find({});
+    const scrolledUsers = await User.find({ hasScrolledToImage: true });
 
-  const getAllUsers = async (req, res) => {
-    const users = await User.find({}).sort({createdAt: -1})
-  
-    res.status(200).json(users)
+    const userCount = allUsers.length;
+    const scrolledUserCount = scrolledUsers.length;
+
+    res.status(200).json({
+      totalUsers: userCount,
+      scrolledUsersCount: scrolledUserCount,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
   }
+};
 
-  
-  module.exports = {
-    getAllUsers
-  }
+module.exports = {
+  getStats,
+};
