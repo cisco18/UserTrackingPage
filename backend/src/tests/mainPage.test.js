@@ -9,48 +9,42 @@ const User = require('../models/User');
 const mainPageRouter = require('../routes/mainPage');
 
 
-
 jest.mock('../models/User', () => ({
   findOne: jest.fn(),
   create: jest.fn(),
 }));
 
-describe("GET /api/stats/all", () => {
+describe('GET /api/stats/all', () => {
+  test('Should respond 200 if user logged and not create a user', async () => {
+    const mockUser = {userUid: 'User 1', hasScrolledToImage: true};
+    User.findOne.mockResolvedValue(mockUser);
 
-    test("Should respond with a 200 status code if user logged in and not create a new user", async () => {
-        const mockUser = { userUid: 'User 1', hasScrolledToImage: true }
-          User.findOne.mockResolvedValue(mockUser);
+    app.use('/api', mainPageRouter);
 
-          app.use('/api', mainPageRouter);
+    const service = {userUid: 'User 1'};
+    await request(app).post('/api/start').send(service);
 
-          const service = { userUid: "User 1" }
-          const response = await request(app).post('/api/start').send(service);
-      
-          expect(User.create).not.toHaveBeenCalled()
-      })
+    expect(User.create).not.toHaveBeenCalled();
+  });
 
-      test("Should respond with a 200 and create new user if user does not exist", async () => {
+  test('Should respond 200 and create new user when doesnt exist', async () => {
+    User.findOne.mockResolvedValue(null);
 
-        User.findOne.mockResolvedValue(null);
+    app.use('/api', mainPageRouter);
 
-        app.use('/api', mainPageRouter);
+    const service = {userUid: 'User 1'};
+    await request(app).post('/api/start').send(service);
 
-        const service = { userUid: "User 1" }
-        const response = await request(app).post('/api/start').send(service);
-    
-        expect(User.create).toHaveBeenCalled()
-      })
+    expect(User.create).toHaveBeenCalled();
+  });
 
-      test("Should fail if no userUid provided", async () => {
+  test('Should fail if no userUid provided', async () => {
+    app.use('/api', mainPageRouter);
 
+    const service = {name: 'User 1'};
+    const response = await request(app).post('/api/start').send(service);
 
-        app.use('/api', mainPageRouter);
-
-        const service = { name: "User 1" }
-        const response = await request(app).post('/api/start').send(service);
-    
-        expect(response.statusCode).toBe(400);
-        expect(response.body.error).toBe('userUid is required');
-      })
-  
-})
+    expect(response.statusCode).toBe(400);
+    expect(response.body.error).toBe('userUid is required');
+  });
+});

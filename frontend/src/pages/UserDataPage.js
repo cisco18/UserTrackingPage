@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Table} from 'antd';
-
+import ApiHandler from '../gateways/ApiHandler';
 
 const columns = [
   {
@@ -18,29 +18,15 @@ const columns = [
 const StatisticsPage = () => {
   const [statisticsData, setStatisticsData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const apiHandler = new ApiHandler('http://localhost:4000');
 
   useEffect(() => {
-    fetch('http://localhost:4000/api/stats/all/')
-        .then((response) => response.json())
-        .then((data) => {
-          const {totalUsers, scrolledUsersCount} = data;
-          const formattedData = [
-            {
-              key: '1',
-              info: 'Number of users who accessed the initial page',
-              value: totalUsers,
-            },
-            {
-              key: '2',
-              info: 'Number of users who scrolled to the image',
-              value: `${scrolledUsersCount}`,
-            },
-          ];
+    apiHandler.fetchStatisticsData()
+        .then((formattedData) => {
           setStatisticsData(formattedData);
           setLoading(false);
         })
         .catch((error) => {
-          console.error('Error fetching data:', error);
           setLoading(false);
         });
   }, []);

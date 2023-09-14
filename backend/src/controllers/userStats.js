@@ -3,7 +3,8 @@ const User = require('../models/User');
 const getStats = async (req, res) => {
   try {
     const allUsers = await User.find({});
-    const scrolledUsers = allUsers.filter((user) => user.hasScrolledToImage === true);
+    const scrolledUsers = allUsers.filter(
+        (user)=> user.hasScrolledToImage === true);
     const userCount = allUsers.length;
     const scrolledUserCount = scrolledUsers.length;
 

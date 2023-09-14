@@ -2,7 +2,8 @@ import React, {useEffect, useState} from 'react';
 import './MainPage.css';
 import {TenParagraphs} from '../components/Paragraph';
 import {Typography, Avatar, Button, Statistic} from 'antd';
-import {uid} from 'uid';
+import ApiHandler from '../gateways/ApiHandler';
+import RandomApiHandler from '../gateways/RandomApiHandler';
 
 const {Title} = Typography;
 
@@ -11,41 +12,24 @@ const MainPage = () => {
   const [serverInfo, setServerInfo] = useState('');
   const [userUidState, setUserUid] = useState('');
 
-  const apiUrl = 'https://random-data-api.com/api/v2/users?size=1';
+  const apiHandler = new ApiHandler('http://localhost:4000');
+  const randomApiHandler = new RandomApiHandler('https://random-data-api.com/api/v2/users?size=1');
+
 
   const checkIfUserHasSession = async () => {
     const userUid = sessionStorage.getItem('userUid');
     if (!userUid) {
-      try {
-        const response = await fetch(apiUrl);
-        if (!response.ok) {
-          throw new Error('API request failed');
-        }
-        const data = await response.json();
-        const newUid = data.uid;
-        sessionStorage.setItem('userUid', newUid);
-        return newUid;
-      } catch (error) {
-        const newUid = uid();
-        sessionStorage.setItem('userUid', newUid);
-        return newUid;
-      }
+      const newUid = await randomApiHandler.fetchRandomData();
+      sessionStorage.setItem('userUid', newUid);
     }
-    return userUid;
+    const newUserUid = sessionStorage.getItem('userUid');
+    return newUserUid;
   };
 
   const handleLogin = async () => {
     const userUid = await checkIfUserHasSession();
     const loginMessage = {userUid};
-    const response = await fetch('http://localhost:4000/api/start/', {
-      method: 'POST',
-      body: JSON.stringify(loginMessage),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-
-
-    });
+    const response = await apiHandler.start(loginMessage);
 
     const serverResponse = await response.json();
 
@@ -77,12 +61,7 @@ const MainPage = () => {
       const scrollMessage = {userUid: userUidState, scrolled};
 
       window.removeEventListener('scroll', handleScroll);
-      await fetch('http://localhost:4000/api/profile/update/', {
-        method: 'PUT',
-        body: JSON.stringify(scrollMessage),
-        headers: {
-          'Content-Type': 'application/json',
-        }});
+      await apiHandler.updateProfile(scrollMessage);
     }
   };
 

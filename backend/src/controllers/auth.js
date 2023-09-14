@@ -6,7 +6,7 @@ const handleAuth = async (req, res) => {
   try {
     const user = await User.findOne(({uid: req.body.userUid}));
     const {userUid} = req.body;
-    
+
     if (!userUid) {
       return res.status(400).json({error: 'userUid is required'});
     }
